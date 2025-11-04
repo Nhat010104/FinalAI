@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+client-app/node_modules/
+
+# Environment variables
+.env
+client-app/.env
+client-app/.env.development
+
+# Uploads
+uploads/
+
+# Logs
+npm-debug.log
+*.log
+
+# Frontend clone repo
+frontend/
+client/
+temp-frontend/
+
+# Build outputs
+client-app/dist/
+dist/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

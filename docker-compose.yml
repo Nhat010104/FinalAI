@@ -1,0 +1,35 @@
+version: '3.8'
+services:
+  backend:
+    build: .
+    ports:
+      - '4000:4000'
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/vatdb
+      - JWT_SECRET=changeme
+    volumes:
+      - .:/app
+      - ./uploads:/app/uploads
+    depends_on:
+      - mongo
+  
+  frontend:
+    image: node:18-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- --host"
+    ports:
+      - '3000:3000'
+    environment:
+      - VITE_API_URL=http://localhost:4000
+    volumes:
+      - ./client-app:/app
+    depends_on:
+      - backend
+  
+  mongo:
+    image: mongo:6.0
+    restart: unless-stopped
+    volumes:
+      - mongodb_data:/data/db
+volumes:
+  mongodb_data:
