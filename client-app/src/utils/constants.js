@@ -34,11 +34,17 @@ export const DEFAULTS = {
 
 // API endpoints (if using backend)
 export const API_ENDPOINTS = {
-  BASE_URL: 'http://localhost:4000', // Hardcoded backend URL
+  BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:4000',
   AUTH: {
     LOGIN: '/api/auth/login',
     REGISTER: '/api/auth/register',
     LOGOUT: '/api/auth/logout'
+  },
+  VAT: {
+    GET_ALL: '/api/vat',
+    GET_BY_ID: '/api/vat/:id',
+    UPLOAD: '/api/vat/upload',
+    PUBLISH: '/api/vat/:id/publish'
   },
   POSTS: {
     GET_ALL: '/api/posts',

@@ -2,7 +2,9 @@ import express from 'express';
 import multer from 'multer';
 import path from 'path';
 import auth from '../middleware/auth.js';
+import n8nAuth from '../middleware/n8nAuth.js';
 import { uploadHandler, listVat, getVat, publishVat } from '../controllers/vatController.js';
+import { n8nWebhookHandler } from '../controllers/n8nController.js';
 
 const router = express.Router();
 const UPLOAD_DIR = 'uploads/vat_files';
@@ -78,6 +80,67 @@ router.post('/upload', auth, upload.single('file'), uploadHandler);
  *         description: Unauthorized
  */
 router.get('/', auth, listVat);
+
+/**
+ * @swagger
+ * /api/vat/webhook:
+ *   post:
+ *     summary: Webhook endpoint for n8n to send invoice data
+ *     description: Accepts JSON with file as base64 or file URL. No JWT auth required, but API key recommended.
+ *     tags: [VAT]
+ *     security:
+ *       - apiKey: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - fileName
+ *             properties:
+ *               fileName:
+ *                 type: string
+ *                 description: Name of the invoice file
+ *               fileData:
+ *                 type: string
+ *                 format: base64
+ *                 description: Base64 encoded file (alternative to fileUrl)
+ *               fileUrl:
+ *                 type: string
+ *                 format: uri
+ *                 description: URL to the file (alternative to fileData)
+ *               senderEmail:
+ *                 type: string
+ *                 format: email
+ *                 description: Email of the sender
+ *               subject:
+ *                 type: string
+ *                 description: Subject/title of the invoice
+ *               receivedDate:
+ *                 type: string
+ *                 format: date-time
+ *                 description: Date when invoice was received
+ *               source:
+ *                 type: string
+ *                 description: Source of the invoice
+ *               extractedData:
+ *                 type: object
+ *                 description: Extracted data from invoice (optional)
+ *               isPublished:
+ *                 type: boolean
+ *                 default: false
+ *                 description: Whether invoice is published
+ *     responses:
+ *       200:
+ *         description: Invoice received and processed successfully
+ *       400:
+ *         description: Bad request (missing required fields)
+ *       401:
+ *         description: Unauthorized (invalid or missing API key)
+ */
+// IMPORTANT: webhook route must be before /:id route to avoid route conflict
+router.post('/webhook', n8nAuth, n8nWebhookHandler);
 
 /**
  * @swagger

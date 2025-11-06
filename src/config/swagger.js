@@ -24,6 +24,12 @@ const options = {
           scheme: 'bearer',
           bearerFormat: 'JWT',
         },
+        apiKey: {
+          type: 'apiKey',
+          in: 'header',
+          name: 'X-API-Key',
+          description: 'API key for n8n webhook authentication (optional if N8N_API_KEY not set)',
+        },
       },
       schemas: {
         User: {
