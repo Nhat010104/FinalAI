@@ -15,9 +15,41 @@ function InvoiceCard({ invoice, apiBaseUrl = 'http://localhost:4000' }) {
 
   const getFileUrl = () => {
     if (invoice.localPath) {
-      // Extract filename from localPath (e.g., "uploads/vat_files/123-filename.pdf")
-      const filename = invoice.localPath.split('/').pop()
-      return `${apiBaseUrl}/uploads/vat_files/${filename}`
+      let filePath = invoice.localPath
+      
+      // Debug: Log original localPath
+      console.log('Original localPath:', filePath)
+      
+      // Remove all occurrences of "uploads/vat_files/" to handle duplicate paths
+      // This handles cases like:
+      // - "uploads/vat_files/uploads/vat_files/filename.pdf"
+      // - "uploads/vat_files/filename.pdf"
+      // - "filename.pdf"
+      while (filePath.includes('uploads/vat_files/')) {
+        filePath = filePath.replace('uploads/vat_files/', '')
+      }
+      
+      // Remove any leading slashes or path separators
+      filePath = filePath.replace(/^[/\\]+/, '')
+      
+      // Get just the filename (last part after any remaining path separators)
+      const filename = filePath.split(/[/\\]/).pop()
+      
+      // Debug: Log processed filename
+      console.log('Processed filename:', filename)
+      
+      // Ensure we have a valid filename
+      if (!filename || filename.trim() === '') {
+        console.warn('Invalid filename after processing')
+        return null
+      }
+      
+      // Build final URL
+      const finalUrl = `${apiBaseUrl}/uploads/vat_files/${filename}`
+      console.log('Final URL:', finalUrl)
+      
+      // Return URL with correct path (server serves /uploads as static)
+      return finalUrl
     }
     return null
   }
@@ -97,7 +129,15 @@ function InvoiceCard({ invoice, apiBaseUrl = 'http://localhost:4000' }) {
               href={fileUrl}
               target="_blank"
               rel="noopener noreferrer"
+              type="application/pdf"
               className="flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-lg transition-all text-sm sm:text-base font-semibold bg-gradient-to-r from-blue-500 to-cyan-500 text-white hover:from-blue-600 hover:to-cyan-600"
+              onClick={(e) => {
+                // Ensure PDF opens in new tab with proper handling
+                if (fileUrl && fileUrl.endsWith('.pdf')) {
+                  window.open(fileUrl, '_blank', 'noopener,noreferrer');
+                  e.preventDefault();
+                }
+              }}
             >
               <Eye size={18} />
               Xem file

@@ -140,7 +140,18 @@ router.get('/', auth, listVat);
  *         description: Unauthorized (invalid or missing API key)
  */
 // IMPORTANT: webhook route must be before /:id route to avoid route conflict
+// POST route for n8n webhook
 router.post('/webhook', n8nAuth, n8nWebhookHandler);
+
+// GET route for testing connection (temporary - remove in production)
+router.get('/webhook', (req, res) => {
+  res.json({ 
+    success: true, 
+    message: 'Webhook endpoint is reachable. Please use POST method for actual webhook calls.',
+    method: 'GET',
+    note: 'This is a test endpoint. Use POST method for n8n webhook.'
+  });
+});
 
 /**
  * @swagger

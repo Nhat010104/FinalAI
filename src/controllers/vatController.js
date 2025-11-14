@@ -29,7 +29,7 @@ export async function uploadHandler(req, res) {
     const vat = await VatFile.create({
       invoiceId: invoice._id,
       fileName: file.originalname,
-      localPath: file.path,
+      localPath: file.filename, // Store only filename to avoid path duplication
       driveFileId: driveFile ? driveFile.id : null,
       source: senderEmail || 'unknown',
       uploadedDate: new Date(),
